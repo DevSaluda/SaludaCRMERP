@@ -2,6 +2,9 @@
 
 # Script para configurar Composer en Hostinger
 
+# Eliminar archivos que pueden causar conflictos
+rm -f composer.lock
+
 # Descargar Composer 2
 curl -sS https://getcomposer.org/installer | php -- --2
 
@@ -15,8 +18,8 @@ chmod +x composer
 ./composer config --global process-timeout 3000
 ./composer config --global optimization-level 2
 
-# Instalar dependencias con PHP 8.0
-./composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
+# Instalar dependencias directamente desde composer.json (no usar el lock)
+./composer install --no-dev --optimize-autoloader --no-plugins --no-scripts --ignore-platform-reqs
 
 # Mostrar información
 echo "Composer 2 instalado correctamente."
