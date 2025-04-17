@@ -1,6 +1,19 @@
-# Instrucciones para Deployment en Hostinger
+# Instrucciones para Deployment en Hostinger (PHP 8.0)
 
-## Opción 1: Deployment Manual
+## Preparación local
+
+1. **Actualiza composer.json**
+   - Asegúrate de que el archivo composer.json es compatible con PHP 8.0 (ya actualizado)
+   - La versión de Laravel debe ser 8.x, no 9.x ni 10.x que requieren PHP 8.1+
+
+2. **Sube los cambios al repositorio**
+   ```bash
+   git add composer.json
+   git commit -m "Actualizar composer.json para PHP 8.0"
+   git push origin master
+   ```
+
+## Opción 1: Deployment Manual en Hostinger (Recomendado)
 
 1. **Iniciar sesión en Hostinger**
    - Accede al panel de control de Hostinger
@@ -8,27 +21,34 @@
    - Selecciona tu dominio `saludaweb.com`
 
 2. **Subir archivos del proyecto**
+   - Descarga los archivos del repositorio a tu computadora
    - Sube todos los archivos del proyecto EXCEPTO:
      - `/vendor/`
      - `composer.lock`
      - `.env` (lo crearás después)
    - Usa el administrador de archivos de Hostinger o FTP
 
-3. **Conectarse por SSH (opcional, si está disponible)**
+3. **Conectarse por SSH**
    - Esto facilitará la ejecución de comandos siguientes
+   - Si no tienes acceso SSH, usa la terminal integrada en el panel de Hostinger
 
-4. **Configurar el archivo .env**
-   - Crea o edita el archivo `.env` con la configuración correcta:
-     - Base de datos
-     - Correo
-     - URL de la aplicación
-     - Claves de API
-
-5. **Instalar dependencias**
+4. **Configurar Composer**
    ```bash
    cd public_html
-   composer install --no-dev --optimize-autoloader
+   chmod +x composer-setup.sh
+   ./composer-setup.sh
    ```
+
+5. **Configurar el archivo .env**
+   - Crear el archivo `.env` con la configuración correcta:
+     ```bash
+     cp .env.example .env
+     nano .env  # o usa el editor de archivos web
+     ```
+   - Actualiza:
+     - `APP_URL=https://saludaweb.com`
+     - Configuración de base de datos (DB_*)
+     - Configuración de correo (MAIL_*)
 
 6. **Generar clave de aplicación**
    ```bash
@@ -56,7 +76,7 @@
 
 ## Opción 2: Deployment usando Git
 
-Si estás teniendo problemas con el archivo `composer.lock`, sigue estos pasos:
+Si prefieres usar Git directamente en el servidor:
 
 1. **Accede a tu cuenta Hostinger por SSH**
 
@@ -65,44 +85,46 @@ Si estás teniendo problemas con el archivo `composer.lock`, sigue estos pasos:
    cd public_html
    ```
 
-3. **Inicializa un repositorio Git (si no existe)**
+3. **Elimina cualquier archivo conflictivo**
+   ```bash
+   rm -f composer.lock
+   ```
+
+4. **Si ya existe un repositorio Git:**
+   ```bash
+   git fetch origin
+   git reset --hard origin/master
+   ```
+
+5. **Si no existe un repositorio Git:**
    ```bash
    git init
-   ```
-
-4. **Agrega el repositorio remoto**
-   ```bash
    git remote add origin https://github.com/DevSaluda/SaludaCRMERP.git
-   ```
-
-5. **Crea un archivo .gitignore temporal**
-   ```bash
-   echo "composer.lock" > .gitignore
-   ```
-
-6. **Haz pull desde el repositorio**
-   ```bash
    git pull origin master
    ```
 
-7. **Sigue los pasos 4 a 9 de la Opción 1**
+6. **Configurar Composer**
+   ```bash
+   chmod +x composer-setup.sh
+   ./composer-setup.sh
+   ```
+
+7. **Sigue los pasos 5-9 de la Opción 1**
 
 ## Solución de problemas comunes
 
-### Error con composer.lock
-Si recibes el error "The following untracked working tree files would be overwritten by merge: composer.lock":
-
-```bash
-rm composer.lock
-git pull origin master
-```
+### Error de PHP Version
+Si ves errores relacionados con la versión de PHP, verifica:
+- La versión de PHP en Hostinger (debe ser 8.0+)
+- La versión de Laravel en composer.json (debe ser 8.x para PHP 8.0)
 
 ### Error al instalar dependencias
-Si composer falla al instalar dependencias:
-
+Usa el script composer-setup.sh o intenta:
 ```bash
-composer install --no-dev --ignore-platform-reqs
+php -d memory_limit=-1 $(which composer) install --no-dev --optimize-autoloader --no-plugins --no-scripts
 ```
 
 ### Error con las migraciones
-Si las migraciones fallan, verifica la conexión a la base de datos en el archivo `.env` 
+Si las migraciones fallan, verifica:
+- La conexión a la base de datos en el archivo `.env`
+- Que la base de datos exista y el usuario tenga permisos 
