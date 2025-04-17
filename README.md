@@ -1,66 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Saluda CRM-ERP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestión para hospitales y licencias médicas.
 
-## About Laravel
+## Requisitos del sistema
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 7.3 / 8.0
+- MySQL 5.7 o superior
+- Composer 2.x
+- Extensiones PHP: BCMath, Ctype, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instrucciones de deployment en Hostinger
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Método 1: Deployment Automático (Recomendado)
 
-## Learning Laravel
+1. **Clonar el repositorio en Hostinger**
+   ```bash
+   cd public_html
+   rm -rf * .*
+   git clone https://github.com/DevSaluda/SaludaCRMERP.git .
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Ejecutar el script de deployment**
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. **Configurar archivo .env**
+   - Edita el archivo `.env` con tus credenciales de base de datos y configuración de correo
+   - Asegúrate de que `APP_URL` esté configurado a tu dominio
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. **Ejecutar migraciones**
+   ```bash
+   php artisan migrate --force
+   php artisan db:seed --force
+   ```
 
-## Laravel Sponsors
+### Método 2: Deployment Manual
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **Subir archivos por FTP**
+   - Descarga los archivos del repositorio a tu computadora
+   - Sube todos los archivos EXCEPTO `/vendor/` y `composer.lock`
 
-### Premium Partners
+2. **Configuración en el servidor**
+   ```bash
+   cd public_html
+   cp .env.example .env
+   # Edita .env con tu configuración
+   
+   # Instala dependencias
+   curl -sS https://getcomposer.org/installer | php
+   php composer.phar install --no-dev --no-scripts --ignore-platform-reqs
+   
+   # Genera clave
+   php artisan key:generate
+   
+   # Optimización
+   php artisan optimize
+   
+   # Migraciones
+   php artisan migrate --force
+   php artisan db:seed --force
+   
+   # Permisos
+   chmod -R 755 .
+   chmod -R 777 storage bootstrap/cache
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Solución de problemas
 
-## Contributing
+### Error de memoria al instalar dependencias
+```bash
+php -d memory_limit=-1 composer.phar install --no-dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Error con PHP version
+Asegúrate de estar utilizando PHP 8.0 o superior:
+```bash
+php -v
+```
 
-## Code of Conduct
+### Error con composer.lock
+```bash
+rm composer.lock
+composer install --no-dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Usuarios por defecto
 
-## Security Vulnerabilities
+- **Administrador**: admin@saludamedica.com (contraseña: admin123)
+- **Recepción**: recepcion@saludamedica.com (contraseña: saluda2025)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Estructura del proyecto
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `/app` - Código principal de la aplicación
+- `/database` - Migraciones y seeders
+- `/resources` - Vistas y assets
+- `/routes` - Definición de rutas
